@@ -38,6 +38,89 @@ CHIP CPU {
         addressM[15],    // Address in data memory (of M)
         pc[15];          // address of next instruction
 
+    //  ==================== instruction set ===================== 
+    // A/C | reserve |          comp        |   dest   |   jump   
+    // ----|---------|----------------------|----------|----------
+    //  i  |   x  x  |  a c1 c2 c3 c4 c5 c6 | d1 d2 d3 | j1 j2 j3
+    // 15  |  14 13  | 12 11 10  9  8  7  6 |  5  4  3 |  2  1  0
+    //  ==================== instruction set ===================== 
     PARTS:
-    // Put your code here:
+    // writeM <- i and d3
+    And(a=instruction[15], b=instruction[3], out=writeM);
+
+    // instruction or outalu
+    Mux16(a=instruction, b=outalu, sel=instruction[15], out=outmux1);
+
+    // ARegister
+    // A命令の時、またはC命令でd1のビットが立っている時にloadビットを有効化
+    Not(in=instruction[15], out=is-a-inst);
+    And(a=instruction[5], b=instruction[15], out=enable-dest-1);
+    Or(a=is-a-inst, b=enable-dest-1, out=out-load-a);
+    ARegister(in=outmux1, load=out-load-a, out=out-areg, out[0..14]=addressM);
+
+    // ARegister or inM
+    Mux16(a=out-areg, b=inM, sel=instruction[12], out=outmux2);
+
+    // DRegister
+    // C命令でd2ビットが立っている時にloadビットを有効化
+    And(a=instruction[15], b=instruction[4], out=enable-dest-2);
+    // Or(a=is-a-inst, b=instruction[4], out=out-load-d);
+    DRegister(in=outalu, load=enable-dest-2, out=outdreg);
+
+    ALU(
+        // input
+        x=outdreg, // DRegister out
+        y=outmux2, // ARegister or Memory
+        zx=instruction[11],
+        nx=instruction[10],
+        zy=instruction[9],
+        ny=instruction[8],
+        f=instruction[7],
+        no=instruction[6],
+        // output
+        out=outalu,
+        out=outM,
+        zr=outzr,
+        ng=outng
+    );
+
+    // not zr, not ng
+    Not(in=outzr, out=notzr);
+    Not(in=outzr, out=notng);
+
+    // わかりやすいように変数名をj1,j2,j3に変換
+    Not(in=instruction[2], out=notj1);
+    Not(in=instruction[1], out=notj2);
+    Not(in=instruction[0], out=notj3);
+
+    Not(in=notj1, out=j1);
+    Not(in=notj2, out=j2);
+    Not(in=notj3, out=j3);
+
+    // jump
+    // (1) ^j1 * j2 * zr * ng
+    And(a=notj1, b=j2, out=tmp11);
+    And(a=outzr, b=outng, out=tmp12);
+    And(a=tmp11, b=tmp12, out=load1);
+
+    // (2) j3 * ^zr * ^ng
+    And(a=j3, b=notzr, out=tmp21);
+    And(a=tmp21, b=notng, out=load2);
+
+    // (3) j1 * ^zr * ng
+    And(a=j1, b=notzr, out=tmp31);
+    And(a=tmp31, b=outng, out=load3);
+
+    // (4) j1 * j2
+    And(a=j1, b=j2, out=load4);
+
+    // load (1) + (2) + (3) + (4)
+    Or(a=load1, b=load2, out=loadt1);
+    Or(a=load3, b=load4, out=loadt2);
+    Or(a=loadt1, b=loadt2, out=loadt);
+    // C命令のときのみ有効
+    And(a=instruction[15], b=loadt, out=outjmp);
+
+    // プログラムカウンタ
+    PC(in=out-areg, load=outjmp, inc=true, reset=reset, out[0..14]=pc);
 }
