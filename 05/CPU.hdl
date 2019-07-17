@@ -88,39 +88,16 @@ CHIP CPU {
     Not(in=outzr, out=notzr);
     Not(in=outng, out=notng);
 
-    // わかりやすいように変数名をj1,j2,j3に変換
-    Not(in=instruction[2], out=notj1);
-    Not(in=instruction[1], out=notj2);
-    Not(in=instruction[0], out=notj3);
+    // notzr and notng = positive
+    And(a=notzr, b=notng, out=positive);
 
-    Not(in=notj1, out=j1);
-    Not(in=notj2, out=j2);
-    Not(in=notj3, out=j3);
+    And(a=instruction[2], b=outng, out=outjlt);
+    And(a=instruction[1], b=outzr, out=outjeq);
+    And(a=instruction[0], b=positive, out=outjgt);
 
-    // jump
-    // (1) ^j1 * j2 * zr * ^ng
-    And(a=notj1, b=j2, out=tmp11);
-    And(a=outzr, b=notng, out=tmp12);
-    And(a=tmp11, b=tmp12, out=load1);
-
-    // (2) j3 * ^zr * ^ng
-    And(a=j3, b=notzr, out=tmp21);
-    And(a=tmp21, b=notng, out=load2);
-
-    // (3) j1 * ^zr * ng
-    And(a=j1, b=notzr, out=tmp31);
-    And(a=tmp31, b=outng, out=load3);
-
-    // (4) j1 * j2 * zr
-    And(a=j1, b=j2, out=tmp41);
-    And(a=tmp41, b=outzr, out=load4);
-
-    // load (1) + (2) + (3) + (4)
-    Or(a=load1, b=load2, out=loadt1);
-    Or(a=load3, b=load4, out=loadt2);
-    Or(a=loadt1, b=loadt2, out=loadt);
-    // C命令のときのみ有効
-    And(a=instruction[15], b=loadt, out=outjmp);
+    // in[3]: C命令のときのみ有効
+    Or8Way(in[0]=outjlt, in[1]=outjeq, in[2]=outjgt, in[3..7]=false, out=tmpjmp);
+    And(a=instruction[15], b=tmpjmp, out=outjmp);
 
     // プログラムカウンタ
     PC(in=out-areg, load=outjmp, inc=true, reset=reset, out[0..14]=pc);
