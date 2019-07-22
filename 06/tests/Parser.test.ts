@@ -1,36 +1,35 @@
-import * as fs from "fs";
-import { ReadStream } from "fs";
 import { Parser } from "../src/Parser";
-import { Readable } from "stream";
+import { MockStream } from "../tests/__mock__/MockStream";
 
 describe("Parser test", () => {
-  beforeAll(() => {
-    jest.spyOn(fs, "createReadStream").mockImplementation(() => {
-      const stream = new Readable() as ReadStream;
-      stream._read = () => {};
-      return stream;
-    });
-  });
   describe("constructor", () => {
     test("Parserインスタンスの生成が可能", () => {
-      const stream: ReadStream = fs.createReadStream("../file");
+      const stream = new MockStream([
+        "1234123412341234\n",
+        "1234123412341234\n",
+        "1234123412341234\n"
+      ]);
       const parser = new Parser(stream);
       expect(parser).not.toBe(null);
     });
   });
   describe("hasMoreCommand", () => {
     test("入力されたファイルにコマンドが存在する場合trueを返す", async () => {
-      const stream = fs.createReadStream("../file");
-      stream.push("1234123412341234");
-      stream.push(null);
+      const stream = new MockStream([
+        "1234123412341234\n",
+        "1234123412341234\n",
+        "1234123412341234\n"
+      ]);
 
       const parser = new Parser(stream);
       expect(await parser.hasMoreCommand()).toBe(true);
+      expect(await parser.hasMoreCommand()).toBe(true);
+      expect(await parser.hasMoreCommand()).toBe(true);
+      expect(await parser.hasMoreCommand()).toBe(false);
     });
-    test("入力されたファイルにコマンドが存在しない場合falseを返す", async () => {
-      const stream = fs.createReadStream("../file");
-      stream.push(null);
 
+    test("入力されたファイルにコマンドが存在しない場合falseを返す", async () => {
+      const stream = new MockStream([]);
       const parser = new Parser(stream);
       expect(await parser.hasMoreCommand()).toBe(false);
     });

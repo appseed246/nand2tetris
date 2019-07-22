@@ -1,26 +1,14 @@
-import { ReadStream } from "fs";
-import * as readline from "readline";
+import { FileStream } from "./FileStream";
 
 export class Parser {
-  private readonly readline: readline.Interface;
   private nextCommand: string | null = null;
 
-  constructor(stream: ReadStream) {
-    this.readline = readline.createInterface({ input: stream });
-  }
+  constructor(private readonly stream: FileStream) {}
 
   async hasMoreCommand(): Promise<boolean> {
-    return new Promise(resolve => {
-      // コマンドが取得できた場合trueを返す
-      this.readline.on("line", (input: string) => {
-        this.nextCommand = input;
-        console.log(this.nextCommand);
-        resolve(true);
-      });
-      // コマンドがない場合falseを返す
-      this.readline.on("close", () => {
-        resolve(false);
-      });
-    });
+    // 次の行の文字列を習得する
+    this.nextCommand = await this.stream.readNextLine();
+    // 次のコマンドが存在するならばtrueを返す
+    return this.nextCommand != null;
   }
 }
