@@ -23,9 +23,6 @@ describe("Parser test", () => {
 
       const parser = new Parser(stream);
       expect(await parser.hasMoreCommand()).toBe(true);
-      expect(await parser.hasMoreCommand()).toBe(true);
-      expect(await parser.hasMoreCommand()).toBe(true);
-      expect(await parser.hasMoreCommand()).toBe(false);
     });
 
     test("入力されたファイルにコマンドが存在しない場合falseを返す", async () => {
