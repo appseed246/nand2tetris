@@ -31,4 +31,20 @@ describe("Parser test", () => {
       expect(await parser.hasMoreCommand()).toBe(false);
     });
   });
+  describe("advance", () => {
+    test("次のコマンドを読み込む", async () => {
+      const stream = new MockStream(["1234123412341234\n"]);
+      const parser = new Parser(stream);
+      expect(await parser.hasMoreCommand()).toBe(true);
+      await parser.advance();
+      expect(await parser.hasMoreCommand()).toBe(false);
+    });
+    test("次のコマンドが存在しない場合に例外を投げる。", async () => {
+      const stream = new MockStream([]);
+      const parser = new Parser(stream);
+      expect(await parser.hasMoreCommand()).toBe(false);
+      const promise = parser.advance();
+      await expect(promise).rejects.toThrowError();
+    });
+  });
 });

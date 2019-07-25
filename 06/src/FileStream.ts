@@ -1,4 +1,4 @@
 export interface FileStream {
-  readNextLine(): Promise<string | null>;
+  readNextLine(): Promise<string>;
   hasNextCommand(): boolean;
 }
