@@ -4,8 +4,8 @@ export class MockStream implements FileStream {
   constructor(private readonly fileData: string[]) {}
 
   async readNextLine(): Promise<string> {
-    const line = this.fileData.pop();
-    console.log(line);
+    const line = this.fileData.shift();
+    // console.log(line);
     if (line == undefined) {
       throw new Error("nextline does not read.");
     }

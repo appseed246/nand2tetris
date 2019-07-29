@@ -47,4 +47,60 @@ describe("Parser test", () => {
       await expect(promise).rejects.toThrowError();
     });
   });
+  describe("commandType", () => {
+    test('ロードしたコマンドが「"A_COMMAND"」', async () => {
+      // prettier-ignore
+      const stream = new MockStream([
+        "@1         \n",
+        "         @10\n",
+        "@abc\n",
+        "..."
+      ]);
+      const parser = new Parser(stream);
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("A_COMMAND");
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("A_COMMAND");
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("A_COMMAND");
+
+      await parser.advance();
+      expect(parser.commandType).toThrow();
+    });
+    test('ロードしたコマンドが「"L_COMMAND"」', async () => {
+      // prettier-ignore
+      const stream = new MockStream([
+        "(abc)\n",
+        "    (end)\n",
+        "()\n"
+      ]);
+      const parser = new Parser(stream);
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("L_COMMAND");
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("L_COMMAND");
+
+      await parser.advance();
+      expect(parser.commandType).toThrow();
+    });
+    test('ロードしたコマンドが「"C_COMMAND"」', async () => {
+      // prettier-ignore
+      const stream = new MockStream([
+        "M=D+1        \n",
+        "         0;JMP\n",
+      ]);
+      const parser = new Parser(stream);
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("C_COMMAND");
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("C_COMMAND");
+    });
+  });
 });
