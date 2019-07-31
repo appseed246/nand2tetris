@@ -22,6 +22,11 @@ export class Parser {
     return this.nextCommand.slice(1);
   }
 
+  dest(): string {
+    const symbols = this.nextCommand.split("=");
+    return symbols[0];
+  }
+
   commandType(): CommandType {
     const command = this.nextCommand;
     if (command.match(/^@/g)) {

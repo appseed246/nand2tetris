@@ -47,7 +47,7 @@ describe("Parser test", () => {
     });
   });
   describe("symbol", () => {
-    test("コマンド種別が「A_COMMAND」の時、シンボル文字列を返す", async () => {
+    test("コマンド種別がA命令の時、シンボル文字列を返す", async () => {
       const parser = getParser(["@symbol\n", "@10"]);
 
       await parser.advance();
@@ -57,6 +57,23 @@ describe("Parser test", () => {
       await parser.advance();
       expect(parser.commandType()).toBe("A_COMMAND");
       expect(parser.symbol()).toBe("10");
+    });
+    describe("dest", () => {
+      test("コマンド種別がC命令での時、destを返す", async () => {
+        // prettier-ignore
+        const parser = getParser([
+          "M=D+1\n",
+          "AD=M+1"
+        ]);
+
+        await parser.advance();
+        expect(parser.commandType()).toBe("C_COMMAND");
+        expect(parser.dest()).toBe("M");
+
+        await parser.advance();
+        expect(parser.commandType()).toBe("C_COMMAND");
+        expect(parser.dest()).toBe("AD");
+      });
     });
   });
   describe("commandType", () => {
