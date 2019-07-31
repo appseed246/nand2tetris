@@ -27,6 +27,16 @@ export class Parser {
     return symbols[0];
   }
 
+  comp(): string {
+    const symbols = this.nextCommand.split(";");
+    return symbols[0];
+  }
+
+  jump(): string {
+    const symbols = this.nextCommand.split(";");
+    return symbols[1];
+  }
+
   commandType(): CommandType {
     const command = this.nextCommand;
     if (command.match(/^@/g)) {
