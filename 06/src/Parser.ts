@@ -12,12 +12,18 @@ export class Parser {
   }
 
   async advance(): Promise<void> {
-    this.nextCommand = await this.stream.readNextLine();
-    console.log(this.nextCommand);
+    const command = await this.stream.readNextLine();
+    this.nextCommand = command.trim();
+    // console.log(this.nextCommand);
+  }
+
+  symbol(): string {
+    // 先頭の「@」以降の文字列を返す
+    return this.nextCommand.slice(1);
   }
 
   commandType(): CommandType {
-    const command = this.nextCommand.trim();
+    const command = this.nextCommand;
     if (command.match(/^@/g)) {
       return "A_COMMAND";
     }

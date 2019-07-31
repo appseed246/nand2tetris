@@ -1,63 +1,73 @@
 import { Parser } from "../src/Parser";
 import { MockStream } from "../tests/__mock__/MockStream";
 
+const getParser = (streamContent: string[]): Parser => {
+  const stream = new MockStream(streamContent);
+  return new Parser(stream);
+};
+
 describe("Parser test", () => {
   describe("constructor", () => {
     test("Parserインスタンスの生成が可能", () => {
-      const stream = new MockStream([
+      const parser = getParser([
         "1234123412341234\n",
         "1234123412341234\n",
         "1234123412341234\n"
       ]);
-      const parser = new Parser(stream);
       expect(parser).not.toBe(null);
     });
   });
   describe("hasMoreCommand", () => {
     test("入力されたファイルにコマンドが存在する場合trueを返す", async () => {
-      const stream = new MockStream([
+      const parser = getParser([
         "1234123412341234\n",
         "1234123412341234\n",
         "1234123412341234\n"
       ]);
-
-      const parser = new Parser(stream);
       expect(await parser.hasMoreCommand()).toBe(true);
     });
 
     test("入力されたファイルにコマンドが存在しない場合falseを返す", async () => {
-      const stream = new MockStream([]);
-      const parser = new Parser(stream);
+      const parser = getParser([]);
       expect(await parser.hasMoreCommand()).toBe(false);
     });
   });
   describe("advance", () => {
     test("次のコマンドを読み込む", async () => {
-      const stream = new MockStream(["1234123412341234\n"]);
-      const parser = new Parser(stream);
+      const parser = getParser(["1234123412341234\n"]);
       expect(await parser.hasMoreCommand()).toBe(true);
       await parser.advance();
       expect(await parser.hasMoreCommand()).toBe(false);
     });
     test("次のコマンドが存在しない場合に例外を投げる。", async () => {
-      const stream = new MockStream([]);
-      const parser = new Parser(stream);
+      const parser = getParser([]);
       expect(await parser.hasMoreCommand()).toBe(false);
       const promise = parser.advance();
       await expect(promise).rejects.toThrowError();
     });
   });
+  describe("symbol", () => {
+    test("コマンド種別が「A_COMMAND」の時、シンボル文字列を返す", async () => {
+      const parser = getParser(["@symbol\n", "@10"]);
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("A_COMMAND");
+      expect(parser.symbol()).toBe("symbol");
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("A_COMMAND");
+      expect(parser.symbol()).toBe("10");
+    });
+  });
   describe("commandType", () => {
     test('ロードしたコマンドが「"A_COMMAND"」', async () => {
       // prettier-ignore
-      const stream = new MockStream([
+      const parser = getParser([
         "@1         \n",
         "         @10\n",
         "@abc\n",
         "..."
       ]);
-      const parser = new Parser(stream);
-
       await parser.advance();
       expect(parser.commandType()).toBe("A_COMMAND");
 
@@ -72,13 +82,11 @@ describe("Parser test", () => {
     });
     test('ロードしたコマンドが「"L_COMMAND"」', async () => {
       // prettier-ignore
-      const stream = new MockStream([
+      const parser = getParser([
         "(abc)\n",
         "    (end)\n",
         "()\n"
       ]);
-      const parser = new Parser(stream);
-
       await parser.advance();
       expect(parser.commandType()).toBe("L_COMMAND");
 
@@ -90,11 +98,10 @@ describe("Parser test", () => {
     });
     test('ロードしたコマンドが「"C_COMMAND"」', async () => {
       // prettier-ignore
-      const stream = new MockStream([
+      const parser = getParser([
         "M=D+1        \n",
         "         0;JMP\n",
       ]);
-      const parser = new Parser(stream);
 
       await parser.advance();
       expect(parser.commandType()).toBe("C_COMMAND");
