@@ -28,8 +28,13 @@ export class Parser {
   }
 
   comp(): string {
-    const symbols = this.nextCommand.split(";");
-    return symbols[0];
+    if (this.nextCommand.includes(";")) {
+      return this.nextCommand.split(";")[0];
+    }
+    if (this.nextCommand.includes("=")) {
+      return this.nextCommand.split("=")[1];
+    }
+    return "";
   }
 
   jump(): string {

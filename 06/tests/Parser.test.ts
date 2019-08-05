@@ -76,16 +76,37 @@ describe("Parser test", () => {
       expect(parser.dest()).toBe("AD");
     });
   });
-  describe("comp/jump", () => {
-    test("コマンド種別がC命令での時、comp/jumpを返す", async () => {
+  describe("comp", () => {
+    test("コマンド種別がC命令での時、compを返す", async () => {
       // prettier-ignore
       const parser = getParser([
-            "0;JMP\n",
-          ]);
+        "0;JMP\n",
+        "M=M+1\n",
+        "@10"
+      ]);
 
       await parser.advance();
       expect(parser.commandType()).toBe("C_COMMAND");
       expect(parser.comp()).toBe("0");
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("C_COMMAND");
+      expect(parser.comp()).toBe("M+1");
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("A_COMMAND");
+      expect(parser.comp()).toBe("");
+    });
+  });
+  describe("jump", () => {
+    test("コマンド種別がC命令での時、jumpを返す", async () => {
+      // prettier-ignore
+      const parser = getParser([
+        "0;JMP\n"
+      ]);
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("C_COMMAND");
       expect(parser.jump()).toBe("JMP");
     });
   });
