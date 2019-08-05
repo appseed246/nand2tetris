@@ -22,24 +22,34 @@ export class Parser {
     return this.nextCommand.slice(1);
   }
 
-  dest(): string {
-    const symbols = this.nextCommand.split("=");
-    return symbols[0];
+  dest(): string | null {
+    // dest=compの場合
+    if (this.nextCommand.includes("=")) {
+      return this.nextCommand.split("=")[0];
+    }
+    // comp;jumpの場合
+    return null;
   }
 
-  comp(): string {
-    if (this.nextCommand.includes(";")) {
-      return this.nextCommand.split(";")[0];
-    }
+  comp(): string | null {
+    // dest=compの場合
     if (this.nextCommand.includes("=")) {
       return this.nextCommand.split("=")[1];
     }
-    return "";
+    // comp;jumpの場合
+    if (this.nextCommand.includes(";")) {
+      return this.nextCommand.split(";")[0];
+    }
+    return null;
   }
 
-  jump(): string {
-    const symbols = this.nextCommand.split(";");
-    return symbols[1];
+  jump(): string | null {
+    // comp;jumpの場合
+    if (this.nextCommand.includes(";")) {
+      return this.nextCommand.split(";")[1];
+    }
+    // dest=compの場合
+    return null;
   }
 
   commandType(): CommandType {
