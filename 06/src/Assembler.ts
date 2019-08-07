@@ -32,7 +32,8 @@ export class Assembler {
           this.printLCommand(parser2);
           break;
         default:
-          throw new Error("Invalid Command Type");
+          // 無効なコマンドを無視する
+          break;
       }
     }
   }

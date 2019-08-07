@@ -71,6 +71,6 @@ export class Parser {
     if (command.match(/^\(\w+\)$/g)) {
       return "L_COMMAND";
     }
-    throw new Error("Illegal Command.");
+    return "UNKNOWN";
   }
 }
