@@ -6,7 +6,7 @@ export class Parser {
 
   constructor(private readonly stream: FileStream) {}
 
-  async hasMoreCommand(): Promise<boolean> {
+  hasMoreCommand(): boolean {
     // 次のコマンドが存在するならばtrueを返す
     return this.stream.hasNextCommand();
   }
@@ -19,7 +19,15 @@ export class Parser {
 
   symbol(): string {
     // 先頭の「@」以降の文字列を返す
-    return this.nextCommand.slice(1);
+    if (this.nextCommand[0] === "@") {
+      return this.nextCommand.slice(1);
+    }
+    if (this.nextCommand.match(/\(\w+\)/)) {
+      return this.nextCommand.replace(/\((\w+)\)/g, "$1");
+    }
+    throw new Error(
+      `invalid command: ${this.nextCommand}, type: ${this.commandType()} `
+    );
   }
 
   dest(): string | null {

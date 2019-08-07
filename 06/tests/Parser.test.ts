@@ -24,24 +24,24 @@ describe("Parser test", () => {
         "1234123412341234\n",
         "1234123412341234\n"
       ]);
-      expect(await parser.hasMoreCommand()).toBe(true);
+      expect(parser.hasMoreCommand()).toBe(true);
     });
 
     test("入力されたファイルにコマンドが存在しない場合falseを返す", async () => {
       const parser = getParser([]);
-      expect(await parser.hasMoreCommand()).toBe(false);
+      expect(parser.hasMoreCommand()).toBe(false);
     });
   });
   describe("advance", () => {
     test("次のコマンドを読み込む", async () => {
       const parser = getParser(["1234123412341234\n"]);
-      expect(await parser.hasMoreCommand()).toBe(true);
+      expect(parser.hasMoreCommand()).toBe(true);
       await parser.advance();
-      expect(await parser.hasMoreCommand()).toBe(false);
+      expect(parser.hasMoreCommand()).toBe(false);
     });
     test("次のコマンドが存在しない場合に例外を投げる。", async () => {
       const parser = getParser([]);
-      expect(await parser.hasMoreCommand()).toBe(false);
+      expect(parser.hasMoreCommand()).toBe(false);
       const promise = parser.advance();
       await expect(promise).rejects.toThrowError();
     });
@@ -57,6 +57,13 @@ describe("Parser test", () => {
       await parser.advance();
       expect(parser.commandType()).toBe("A_COMMAND");
       expect(parser.symbol()).toBe("10");
+    });
+    test("コマンド種別がL命令の時、シンボル文字列を返す", async () => {
+      const parser = getParser(["    (symbol)\n"]);
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("L_COMMAND");
+      expect(parser.symbol()).toBe("symbol");
     });
   });
   describe("dest", () => {

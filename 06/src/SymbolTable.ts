@@ -10,7 +10,18 @@ export class SymbolTable {
     return Object.keys(this.table).includes(symbol);
   }
 
-  getAddress(symbol: string): number | null {
-    return this.table[symbol] || null;
+  getAddress(symbol: string): number {
+    return this.table[symbol];
+  }
+
+  /**
+   * print table content (for debug)
+   */
+  printTable() {
+    console.log("------------- SymbolTable -------------");
+    Object.entries(this.table).forEach(([symbol, address]) => {
+      console.log(`symbol:${symbol}, address:${address}`);
+    });
+    console.log("------------- SymbolTable -------------");
   }
 }
