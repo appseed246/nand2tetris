@@ -107,3 +107,6 @@ typings/
 .history
 
 # End of https://www.gitignore.io/api/node,visualstudiocode
+
+# hack機械語ファイル格納フォルダ
+hack/
