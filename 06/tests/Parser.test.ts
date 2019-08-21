@@ -70,10 +70,11 @@ describe("Parser test", () => {
     test("コマンド種別がC命令での時、destを返す", async () => {
       // prettier-ignore
       const parser = getParser([
-            "M=D+1\n",
-            "AD=M+1\n",
-            "0;JMP\n"
-          ]);
+        "M=D+1\n",
+        "AD=M+1\n",
+        "0;JMP // コメント\n",
+        "D=A // コメントを含む行\n"
+      ]);
 
       await parser.advance();
       expect(parser.commandType()).toBe("C_COMMAND");
@@ -86,14 +87,19 @@ describe("Parser test", () => {
       await parser.advance();
       expect(parser.commandType()).toBe("C_COMMAND");
       expect(parser.dest()).toBe(null);
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("C_COMMAND");
+      expect(parser.dest()).toBe("D");
     });
   });
   describe("comp", () => {
     test("コマンド種別がC命令での時、compを返す", async () => {
       // prettier-ignore
       const parser = getParser([
-        "0;JMP\n",
+        "0;JMP // コメント\n",
         "M=M+1\n",
+        "D=A // コメントを含む行\n"
       ]);
 
       await parser.advance();
@@ -103,19 +109,28 @@ describe("Parser test", () => {
       await parser.advance();
       expect(parser.commandType()).toBe("C_COMMAND");
       expect(parser.comp()).toBe("M+1");
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("C_COMMAND");
+      expect(parser.comp()).toBe("A");
     });
   });
   describe("jump", () => {
     test("コマンド種別がC命令での時、jumpを返す", async () => {
       // prettier-ignore
       const parser = getParser([
-        "0;JMP\n",
+        "0;JMP // コメント\n",
         "M=M+1\n",
+        "D=A // コメントを含む行\n"
       ]);
 
       await parser.advance();
       expect(parser.commandType()).toBe("C_COMMAND");
       expect(parser.jump()).toBe("JMP");
+
+      await parser.advance();
+      expect(parser.commandType()).toBe("C_COMMAND");
+      expect(parser.jump()).toBe(null);
 
       await parser.advance();
       expect(parser.commandType()).toBe("C_COMMAND");

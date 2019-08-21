@@ -13,7 +13,8 @@ export class Parser {
 
   async advance(): Promise<void> {
     const command = await this.stream.readNextLine();
-    this.nextCommand = command.trim();
+    const commandWithoutComment = command.split("//")[0];
+    this.nextCommand = commandWithoutComment.trim();
     // console.log(this.nextCommand);
   }
 
