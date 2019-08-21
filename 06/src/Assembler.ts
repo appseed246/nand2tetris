@@ -59,7 +59,9 @@ export class Assembler {
     let address: number;
     // シンボルが10進数文字列ならばシンボルの値をそのまま使用する
     if (this.isDecimal(symbol)) {
-      address = Number(symbol);
+      const toBinary = (n: number) => parseInt(n.toString(2));
+      address = toBinary(Number(symbol));
+      // console.log(address);
     } else if (this.symbolTable.contains(symbol)) {
       address = this.symbolTable.getAddress(symbol);
     } else {
@@ -105,7 +107,7 @@ export class Assembler {
    * @param n 10進数判定対象文字列
    */
   private isDecimal(n: string) {
-    return n.match(/^[1-9][0-9]+$|^0$/g);
+    return n.match(/^[1-9]*[0-9]+$|^0$/g);
   }
 }
 
