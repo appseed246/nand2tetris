@@ -56,20 +56,21 @@ export class Assembler {
 
   private printACommand(parser: Parser): void {
     const symbol = parser.symbol();
-    let address: number;
+    let address: string;
+    const toBinary = (n: string) => parseInt(n, 10).toString(2);
     // シンボルが10進数文字列ならばシンボルの値をそのまま使用する
     if (this.isDecimal(symbol)) {
-      const toBinary = (n: number) => parseInt(n.toString(2));
-      address = toBinary(Number(symbol));
+      address = toBinary(symbol);
       // console.log(address);
     } else if (this.symbolTable.contains(symbol)) {
-      address = this.symbolTable.getAddress(symbol);
+      const rawAddress = this.symbolTable.getAddress(symbol);
+      address = toBinary(rawAddress.toString(10));
     } else {
       this.symbolTable.addEntry(symbol, this.ramAddress);
-      address = this.ramAddress;
+      address = toBinary(this.ramAddress.toString(10));
       this.ramAddress++;
     }
-    this.writeOut(this.zeroPadding(String(address), 16));
+    this.writeOut(this.zeroPadding(address, 16));
   }
 
   private printCCommand(parser: Parser): void {
