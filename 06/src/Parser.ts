@@ -66,7 +66,7 @@ export class Parser {
     if (command.match(/^@/g)) {
       return "A_COMMAND";
     }
-    if (command.match(/(^\w+\=[-]*\w+)|(\w+\;\w+)/g)) {
+    if (command.match(/(^\w+\=[-!]*\w+)|(\w+\;\w+)/g)) {
       return "C_COMMAND";
     }
     if (command.match(/^\(\w+\)$/g)) {

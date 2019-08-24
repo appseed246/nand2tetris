@@ -67,75 +67,57 @@ describe("Parser test", () => {
     });
   });
   describe("dest", () => {
-    test("コマンド種別がC命令での時、destを返す", async () => {
-      // prettier-ignore
-      const parser = getParser([
-        "M=D+1\n",
-        "AD=M+1\n",
-        "0;JMP // コメント\n",
-        "D=A // コメントを含む行\n"
-      ]);
+    const expected: [string, string | null][] = [
+      ["M=D+1\n", "M"],
+      ["AD=M+1", "AD"],
+      ["0;JMP // コメント", null],
+      ["D=A // コメントを含む行", "D"],
+      ["M=-1", "M"],
+      ["M=!M", "M"]
+    ];
 
-      await parser.advance();
-      expect(parser.commandType()).toBe("C_COMMAND");
-      expect(parser.dest()).toBe("M");
-
-      await parser.advance();
-      expect(parser.commandType()).toBe("C_COMMAND");
-      expect(parser.dest()).toBe("AD");
-
-      await parser.advance();
-      expect(parser.commandType()).toBe("C_COMMAND");
-      expect(parser.dest()).toBe(null);
-
-      await parser.advance();
-      expect(parser.commandType()).toBe("C_COMMAND");
-      expect(parser.dest()).toBe("D");
-    });
+    const parser = getParser(expected.map(([command, _]) => command));
+    for (const [command, dest] of expected) {
+      test(`command: ${command}の時、dest:${dest}を返す`, async () => {
+        await parser.advance();
+        expect(parser.commandType()).toBe("C_COMMAND");
+        expect(parser.dest()).toBe(dest);
+      });
+    }
   });
   describe("comp", () => {
-    test("コマンド種別がC命令での時、compを返す", async () => {
-      // prettier-ignore
-      const parser = getParser([
-        "0;JMP // コメント\n",
-        "M=M+1\n",
-        "D=A // コメントを含む行\n"
-      ]);
+    const expected: [string, string | null][] = [
+      ["0;JMP // コメント\n", "0"],
+      ["M=M+1", "M+1"],
+      ["D=A // コメントを含む", "A"],
+      ["M=-1", "-1"],
+      ["M=!M", "!M"]
+    ];
 
-      await parser.advance();
-      expect(parser.commandType()).toBe("C_COMMAND");
-      expect(parser.comp()).toBe("0");
-
-      await parser.advance();
-      expect(parser.commandType()).toBe("C_COMMAND");
-      expect(parser.comp()).toBe("M+1");
-
-      await parser.advance();
-      expect(parser.commandType()).toBe("C_COMMAND");
-      expect(parser.comp()).toBe("A");
-    });
+    const parser = getParser(expected.map(([command, _]) => command));
+    for (const [command, comp] of expected) {
+      test(`command: ${command}の時、comp:${comp}を返す`, async () => {
+        await parser.advance();
+        expect(parser.commandType()).toBe("C_COMMAND");
+        expect(parser.comp()).toBe(comp);
+      });
+    }
   });
   describe("jump", () => {
-    test("コマンド種別がC命令での時、jumpを返す", async () => {
-      // prettier-ignore
-      const parser = getParser([
-        "0;JMP // コメント\n",
-        "M=M+1\n",
-        "D=A // コメントを含む行\n"
-      ]);
+    const expected: [string, string | null][] = [
+      ["0;JMP // コメント\n", "JMP"],
+      ["M=M+1\n", null],
+      ["D=A // コメントを含む行\n", null]
+    ];
 
-      await parser.advance();
-      expect(parser.commandType()).toBe("C_COMMAND");
-      expect(parser.jump()).toBe("JMP");
-
-      await parser.advance();
-      expect(parser.commandType()).toBe("C_COMMAND");
-      expect(parser.jump()).toBe(null);
-
-      await parser.advance();
-      expect(parser.commandType()).toBe("C_COMMAND");
-      expect(parser.jump()).toBe(null);
-    });
+    const parser = getParser(expected.map(([command, _]) => command));
+    for (const [command, jump] of expected) {
+      test(`command: ${command}の時、jump:${jump}を返す`, async () => {
+        await parser.advance();
+        expect(parser.commandType()).toBe("C_COMMAND");
+        expect(parser.jump()).toBe(jump);
+      });
+    }
   });
   describe("commandType", () => {
     test('ロードしたコマンドが「"A_COMMAND"」', async () => {
