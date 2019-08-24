@@ -21,6 +21,7 @@ export class Assembler {
     const parser2 = new Parser(new Stream(filename));
     while (parser2.hasMoreCommand()) {
       await parser2.advance();
+      // console.log(`type: ${parser2.commandType()}`);
       switch (parser2.commandType()) {
         case "A_COMMAND":
           this.printACommand(parser2);
@@ -39,7 +40,7 @@ export class Assembler {
   }
 
   private async initSymbolTable(parser: Parser): Promise<void> {
-    let romAddress: number = 0;
+    let romAddress: number = -1;
     while (await parser.hasMoreCommand()) {
       await parser.advance();
       if (
@@ -49,6 +50,7 @@ export class Assembler {
         romAddress++;
       } else if (parser.commandType() === "L_COMMAND") {
         // シンボルの次の行のアドレスと紐付ける
+        // console.log(`symbol: ${parser.symbol()}, address:${romAddress}`);
         this.symbolTable.addEntry(parser.symbol(), romAddress + 1);
       }
     }
