@@ -50,7 +50,7 @@ export class Assembler {
         romAddress++;
       } else if (parser.commandType() === "L_COMMAND") {
         // シンボルの次の行のアドレスと紐付ける
-        // console.log(`symbol: ${parser.symbol()}, address:${romAddress}`);
+        // console.log(`symbol: ${parser.symbol()}, address:${romAddress + 1}`);
         this.symbolTable.addEntry(parser.symbol(), romAddress + 1);
       }
     }
@@ -58,6 +58,7 @@ export class Assembler {
 
   private printACommand(parser: Parser): void {
     const symbol = parser.symbol();
+    // console.log(`symbol: ${symbol}`);
     let address: string;
     const toBinary = (n: string) => parseInt(n, 10).toString(2);
     // シンボルが10進数文字列ならばシンボルの値をそのまま使用する

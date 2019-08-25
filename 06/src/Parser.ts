@@ -19,12 +19,13 @@ export class Parser {
   }
 
   symbol(): string {
-    // 先頭の「@」以降の文字列を返す
+    // A_COMMANDの場合、先頭の「@」以降の文字列を返す
     if (this.nextCommand[0] === "@") {
       return this.nextCommand.slice(1);
     }
-    if (this.nextCommand.match(/\(\w+\)/)) {
-      return this.nextCommand.replace(/\((\w+)\)/g, "$1");
+    if (this.nextCommand.match(/^\(.+\)$/)) {
+      // console.log(`nextCommand: ${this.nextCommand}`);
+      return this.nextCommand.replace(/^\((.+)\)$/g, "$1");
     }
     throw new Error(
       `invalid command: ${this.nextCommand}, type: ${this.commandType()} `
@@ -69,7 +70,7 @@ export class Parser {
     if (command.match(/(^\w+\=[-!]*\w+)|(\w+\;\w+)/g)) {
       return "C_COMMAND";
     }
-    if (command.match(/^\(\w+\)$/g)) {
+    if (command.match(/^\(.+\)$/)) {
       return "L_COMMAND";
     }
     return "UNKNOWN";
