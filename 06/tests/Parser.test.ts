@@ -46,6 +46,24 @@ describe("Parser test", () => {
       await expect(promise).rejects.toThrowError();
     });
   });
+  describe("rewind", () => {
+    test("ファイルの末尾まで読み取った後に先頭まで巻き戻し、再び末尾まで読み取る", async () => {
+      const parser = getParser(["@0\n", "M=D", "M=A"]);
+
+      await parser.advance();
+      await parser.advance();
+      await parser.advance();
+      expect(parser.hasMoreCommand()).toBe(false);
+
+      parser.rewind();
+      expect(parser.hasMoreCommand()).toBe(true);
+
+      await parser.advance();
+      await parser.advance();
+      await parser.advance();
+      expect(parser.hasMoreCommand()).toBe(false);
+    });
+  });
   describe("symbol", () => {
     test("コマンド種別がA命令の時、シンボル文字列を返す", async () => {
       const parser = getParser(["@symbol\n", "@10"]);

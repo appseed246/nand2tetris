@@ -18,6 +18,10 @@ export class Parser {
     // console.log(this.nextCommand);
   }
 
+  rewind(): void {
+    this.stream.rewind();
+  }
+
   symbol(): string {
     // A_COMMANDの場合、先頭の「@」以降の文字列を返す
     if (this.nextCommand[0] === "@") {
