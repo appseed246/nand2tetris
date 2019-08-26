@@ -1,4 +1,4 @@
-import { FileStream } from "./FileStream";
+import { Stream } from "./Stream";
 import { CommandType } from "./CommandType";
 
 export class Parser {
@@ -16,7 +16,7 @@ export class Parser {
     "not"
   ];
 
-  constructor(private stream: FileStream) {}
+  constructor(private stream: Stream) {}
 
   public hasMoreCommand() {
     // 次のコマンドが存在するならばtrueを返す
