@@ -1,7 +1,7 @@
 import { existsSync } from "fs";
 import { AssemblerCore } from "./AssemblerCore";
 import { Parser } from "./Parser";
-import { Stream } from "./Stream";
+import { FileStream } from "./FileStream";
 import { FileWriter } from "./FileWriter";
 
 /**
@@ -26,7 +26,7 @@ import { FileWriter } from "./FileWriter";
     return;
   }
 
-  const parser = new Parser(new Stream(filename));
+  const parser = new Parser(new FileStream(filename));
   const writer = new FileWriter(filename.replace(".asm", ".hack"));
   const assembler = new AssemblerCore(parser, writer);
 

@@ -1,6 +1,6 @@
-import { FileStream } from "../../src/FileStream";
+import { Stream } from "../../src/Stream";
 
-export class MockStream implements FileStream {
+export class MockStream implements Stream {
   private lineCount = 0;
 
   constructor(private readonly fileData: string[]) {}

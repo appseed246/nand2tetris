@@ -1,10 +1,10 @@
-import { FileStream } from "./FileStream";
+import { Stream } from "./Stream";
 import { CommandType } from "./CommandType";
 
 export class Parser {
   private nextCommand: string;
 
-  constructor(private readonly stream: FileStream) {}
+  constructor(private readonly stream: Stream) {}
 
   hasMoreCommand(): boolean {
     // 次のコマンドが存在するならばtrueを返す
